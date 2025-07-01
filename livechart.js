@@ -66,7 +66,46 @@ async function schedule() {
             })
         })
         
-        return schedule
+        return {
+            success: true,
+            data: schedule
+        }
+        
+    } catch (err) {
+        return {
+            success: false,
+            message: err.message
+        }
+    }
+}
+
+async function search(q) {
+    const URL = "https://www.livechart.me/search?q="+ q
+    try {
+        const { data } = await axios.get(URL)
+        const $ = cheerio.load(data)
+        const result = []
+        
+        $('.callout.grouped-list.anime-list > .grouped-list-item.anime-item').each((_, el) => {
+            const title = $(el).find('.anime-item__body__title strong a').text().trim()
+            const episode = $(el).find('.anime-item__body__title > span').text()
+            const link = $(el).find('.anime-item__body__title strong a').attr('href')
+            const premiere_date_time = $(el).find('.info > span').first().text()
+            const rating = $(el).find('.info > .fake-link').text()
+            
+            result.push({
+                title,
+                episode: episode.replace(/[()]/g, '').split(',')[1]?.trim(),
+                link: 'https://www.livechart.me'+ link,
+                premiere_date_time,
+                rating
+            })
+        })
+        
+        return {
+            success: true,
+            data: result
+        }
         
     } catch (err) {
         return {
