@@ -114,3 +114,5 @@ async function search(q) {
         }
     }
 }
+
+export { headlines, schedule, search }
